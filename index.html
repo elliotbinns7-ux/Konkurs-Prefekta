@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Siedem pieczęci mądrości</title>
+<style>
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  min-height: 100vh;
+  background: radial-gradient(ellipse at top, #233c65, #090f20);
+  color: #f4ead7;
+  font-family: Georgia, serif;
+  padding: 40px 18px;
+}
+main { max-width: 720px; margin: auto; }
+header { text-align: center; margin-bottom: 32px; }
+.symbol { font-size: 52px; color: #dfbd79; }
+h1 { color: #dfbd79; font-size: clamp(30px, 6vw, 46px); }
+p { line-height: 1.7; }
+.small { color: #bec9dc; font-size: 15px; }
+#seals {
+  display: flex; justify-content: center;
+  gap: 10px; flex-wrap: wrap; margin: 28px 0;
+}
+.seal {
+  width: 44px; height: 44px; border-radius: 50%;
+  border: 1px solid #7f91b1; display: grid;
+  place-items: center; color: #aab7ce;
+}
+.seal.current { border: 2px solid #dfbd79; color: #dfbd79; }
+.seal.done { background: #dfbd79; color: #101b30; }
+section {
+  background: #101d34;
+  border: 1px solid #aa8b52;
+  border-radius: 18px; padding: 28px;
+  box-shadow: 0 18px 50px #0005;
+}
+h2 { color: #dfbd79; margin-top: 0; }
+label { display: block; margin: 22px 0 10px; }
+input, button {
+  width: 100%; padding: 15px; border-radius: 8px;
+  font: inherit; font-size: 17px;
+}
+input {
+  background: #080f20; border: 1px solid #7f91b1;
+  color: white;
+}
+button {
+  margin-top: 14px; background: #dfbd79;
+  color: #111b2c; border: none;
+  cursor: pointer; font-weight: bold;
+}
+button:hover { background: #f0d59e; }
+input:focus-visible, button:focus-visible {
+  outline: 3px solid #a8cdfa; outline-offset: 4px;
+}
+#message { min-height: 28px; color: #f0cd91; }
+footer { text-align: center; margin-top: 28px; }
+</style>
+</head>
+<body>
+<main>
+  <header>
+    <div class="symbol" aria-hidden="true">✦</div>
+    <p class="small">KONKURS PREFEKTA NACZELNEGO</p>
+    <h1>Siedem pieczęci mądrości</h1>
+    <p>
+      W zapomnianej komnacie wieży Ravenclawu odnaleziono
+      księgę zamkniętą siedmioma pieczęciami.
+      Każda z nich ustąpi wyłącznie przed bystrym umysłem.
+      Czy zdołasz odkryć jej tajemnicę?
+    </p>
+    <p class="small">
+      Rozwiązuj zagadki po kolei. Wielkość liter
+      i polskie znaki nie mają znaczenia.
+      Po ukończeniu zrób zrzut ekranu.
+    </p>
+  </header>
+
+  <div id="seals" aria-label="Postęp konkursu"></div>
+
+  <section aria-labelledby="title">
+    <h2 id="title" tabindex="-1"></h2>
+    <p id="story"></p>
+    <p id="question"></p>
+
+    <form id="form">
+      <label for="answer">Twoja odpowiedź:</label>
+      <input id="answer" autocomplete="off" required>
+      <button type="submit">Złam pieczęć ✦</button>
+    </form>
+
+    <p id="message" role="status"></p>
+  </section>
+
+  <footer class="small">
+    Wiedza otwiera drzwi. Mądrość pozwala wybrać właściwe.
+  </footer>
+</main>
+
+<script>
+const puzzles = [
+  {
+    title: "I · Pieczęć ciszy",
+    story: "Na pierwszej pieczęci widnieje napis:",
+    question: "Co znika w chwili, gdy wypowiesz jego nazwę?",
+    answers: ["cisza", "ciszę"]
+  },
+  {
+    title: "II · Pieczęć szyfru",
+    story: "Na pergaminie zapisano: N B H J B.",
+    question: "Każdą literę przesunięto o jedno miejsce do przodu w alfabecie A–Z, bez polskich znaków. Cofnij litery o jedno miejsce. Jakie słowo otrzymasz?",
+    answers: ["magia"]
+  },
+  {
+    title: "III · Pieczęć porządku",
+    story: "Trzy księgi stoją obok siebie: czerwona, niebieska i zielona.",
+    question: "Czerwona stoi bezpośrednio na lewo od niebieskiej. Zielona nie stoi obok czerwonej. Jaki kolor ma środkowa księga?",
+    answers: ["niebieski", "niebieska"]
+  },
+  {
+    title: "IV · Pieczęć rozsypanych liter",
+    story: "Litery na kamiennej tablicy zamieniły się miejscami: W A R T H O G.",
+    question: "Ułóż z wszystkich liter nazwę szkoły magii.",
+    answers: ["hogwart"]
+  },
+  {
+    title: "V · Pieczęć liczb",
+    story: "Wokół zamka wyryto liczby: 2, 6, 12, 20, 30, …",
+    question: "Różnice między kolejnymi liczbami wynoszą 4, 6, 8, 10. Jaka liczba będzie następna, jeśli różnica znów wzrośnie o 2?",
+    answers: ["42"]
+  },
+  {
+    title: "VI · Pieczęć prawdy",
+    story: "Klucz znajduje się w jednej z trzech skrzyń. Dokładnie jeden napis jest prawdziwy.",
+    question: "Skrzynia A: „Klucz jest w B”. Skrzynia B: „Klucza nie ma tutaj”. Skrzynia C: „Klucza nie ma w A”. W której skrzyni jest klucz? Wpisz A, B lub C.",
+    answers: ["a"]
+  },
+  {
+    title: "VII · Pieczęć ostatniego słowa",
+    story: "Odczytaj pierwsze litery siedmiu słów:",
+    question: "Milczące · Atramentowe · Drogowskazy · Rozświetlają · Odkrywane · Ścieżki · Czarodziejów",
+    answers: ["mądrość"]
+  }
+];
+
+let stage = 0;
+const title = document.getElementById("title");
+const story = document.getElementById("story");
+const question = document.getElementById("question");
+const form = document.getElementById("form");
+const answer = document.getElementById("answer");
+const message = document.getElementById("message");
+const seals = document.getElementById("seals");
+
+function normalize(text) {
+  return text.trim().toLowerCase()
+    .normalize("NFD").replace(/[\u0300-\u036f]/g, "")
+    .replace(/ł/g, "l");
+}
+
+function render() {
+  seals.replaceChildren();
+  for (let i = 0; i < puzzles.length; i++) {
+    const seal = document.createElement("span");
+    seal.className = "seal";
+    if (i < stage) seal.classList.add("done");
+    if (i === stage) seal.classList.add("current");
+    seal.textContent = i < stage ? "✓" : i + 1;
+    seal.setAttribute("aria-label",
+      "Pieczęć " + (i + 1) + ": " +
+      (i < stage ? "zdobyta" : i === stage ? "aktywna" : "zamknięta"));
+    seals.appendChild(seal);
+  }
+
+  if (stage === puzzles.length) {
+    title.textContent = "✦ Księga została otwarta!";
+    story.textContent = "Wszystkie siedem pieczęci rozbłysło złotym światłem. Na ostatniej stronie pojawił się napis: „Prawdziwa mądrość zaczyna się od odwagi zadawania pytań”.";
+    question.textContent = "Gratulacje! Ukończono 7 z 7 prób. Zrób zrzut tego ekranu i prześlij go organizatorce konkursu.";
+    form.hidden = true;
+    return;
+  }
+
+  title.textContent = puzzles[stage].title;
+  story.textContent = puzzles[stage].story;
+  question.textContent = puzzles[stage].question;
+  answer.value = "";
+}
+
+form.addEventListener("submit", function(event) {
+  event.preventDefault();
+  const correct = puzzles[stage].answers.some(
+    value => normalize(value) === normalize(answer.value)
+  );
+
+  if (!correct) {
+    message.textContent = "Pieczęć pozostaje zamknięta. Spróbuj ponownie.";
+    return;
+  }
+
+  stage++;
+  render();
+  message.textContent = stage === puzzles.length
+    ? "Wszystkie pieczęcie zostały złamane!"
+    : "Poprawna odpowiedź! Otworzyła się kolejna pieczęć.";
+  title.focus();
+});
+
+render();
+</script>
+</body>
+</html>
